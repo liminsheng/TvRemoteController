@@ -1,0 +1,3 @@
+include ':server'
+include ':app'
+rootProject.name = "TvRemoteController"
