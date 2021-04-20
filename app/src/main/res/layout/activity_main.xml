@@ -1,18 +1,182 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".MainActivity">
+<layout>
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Hello World!"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+    <data>
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+        <import type="android.view.View" />
+
+        <import type="com.minsheng.controller.view.DirectionDpadView" />
+
+        <import type="com.minsheng.controller.util.DbTool" />
+
+        <import type="android.text.TextUtils" />
+
+        <variable
+            name="onShotDownClick"
+            type="View.OnClickListener" />
+
+        <variable
+            name="onVolumeDownClick"
+            type="View.OnClickListener" />
+
+        <variable
+            name="onVolumeUpClick"
+            type="View.OnClickListener" />
+
+        <variable
+            name="onHomeClick"
+            type="View.OnClickListener" />
+
+        <variable
+            name="onMenuClick"
+            type="View.OnClickListener" />
+
+        <variable
+            name="onBackClick"
+            type="View.OnClickListener" />
+
+        <variable
+            name="tips"
+            type="String" />
+
+        <variable
+            name="directionDpadListener"
+            type="DirectionDpadView.OnDirectionKeyListener" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@mipmap/remote_activity_bg"
+        tools:context=".MainActivity">
+
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/mToolbar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/white"
+            android:minHeight="?android:actionBarSize"
+            app:layout_constraintTop_toTopOf="parent"
+            app:title="手机遥控"
+            app:titleTextColor="#6E6E6E" />
+
+        <androidx.appcompat.widget.AppCompatImageButton
+            android:id="@+id/mIbKeyboardPower"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:layout_marginStart="40dp"
+            android:layout_marginLeft="40dp"
+            android:layout_marginTop="50dp"
+            android:background="@drawable/sel_ddap_small_button"
+            android:onClick="@{onShotDownClick}"
+            android:src="@mipmap/dpad_shutdown"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/mToolbar" />
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="140dp"
+            android:layout_height="60dp"
+            android:background="@mipmap/dpad_volume_background"
+            android:padding="8dp"
+            app:layout_constraintLeft_toLeftOf="@+id/mIbKeyboardPower"
+            app:layout_constraintRight_toRightOf="@+id/mIbKeyboardHome"
+            app:layout_constraintTop_toTopOf="@+id/mIbKeyboardPower">
+
+            <androidx.appcompat.widget.AppCompatImageButton
+                android:id="@+id/mIbKeyboardVolumeDown"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:background="@null"
+                android:onClick="@{onVolumeDownClick}"
+                android:src="@mipmap/dpad_volume_left"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toLeftOf="@+id/mIbKeyboardVolumeUp"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <androidx.appcompat.widget.AppCompatImageButton
+                android:id="@+id/mIbKeyboardVolumeUp"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:background="@null"
+                android:onClick="@{onVolumeUpClick}"
+                android:src="@mipmap/dpad_volume_right"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintLeft_toRightOf="@+id/mIbKeyboardVolumeDown"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <androidx.appcompat.widget.AppCompatImageButton
+            android:id="@+id/mIbKeyboardHome"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:layout_marginEnd="40dp"
+            android:layout_marginRight="40dp"
+            android:background="@drawable/sel_ddap_small_button"
+            android:onClick="@{onHomeClick}"
+            android:src="@mipmap/dpad_home"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/mToolbar"
+            app:layout_constraintTop_toTopOf="@+id/mIbKeyboardPower" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/mTvTips"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:layout_marginLeft="40dp"
+            android:layout_marginTop="20dp"
+            android:layout_marginRight="40dp"
+            android:background="@mipmap/dpad_tips_bg"
+            android:drawableLeft="@mipmap/dpad_tips_icon"
+            android:gravity="center_vertical"
+            android:paddingLeft="20dp"
+            android:paddingRight="20dp"
+            android:text="@{tips, default= `手机遥控`}"
+            android:textColor="#8C8C8C"
+            android:textSize="13sp"
+            android:visibility="@{TextUtils.isEmpty(tips) ? View.INVISIBLE : View.VISIBLE}"
+            app:layout_constraintTop_toBottomOf="@+id/mIbKeyboardPower" />
+
+        <com.minsheng.controller.view.DirectionDpadView
+            android:id="@+id/mDirectionDpadView"
+            android:layout_width="280dp"
+            android:layout_height="280dp"
+            android:layout_marginTop="50dp"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/mTvTips"
+            app:setDirectionKeyListener="@{directionDpadListener}" />
+
+        <androidx.appcompat.widget.AppCompatImageButton
+            android:id="@+id/mIbKeyboardMenu"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:layout_marginStart="40dp"
+            android:layout_marginLeft="40dp"
+            android:layout_marginBottom="60dp"
+            android:background="@drawable/sel_ddap_small_button"
+            android:onClick="@{onMenuClick}"
+            android:src="@mipmap/dpad_menu"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintLeft_toLeftOf="parent" />
+
+        <androidx.appcompat.widget.AppCompatImageButton
+            android:id="@+id/mIbKeyboardBack"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:layout_marginEnd="40dp"
+            android:layout_marginRight="40dp"
+            android:layout_marginBottom="60dp"
+            android:background="@drawable/sel_ddap_small_button"
+            android:onClick="@{onBackClick}"
+            android:src="@mipmap/dpad_back"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintRight_toRightOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</layout>
