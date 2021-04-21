@@ -1,28 +1,87 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="#F3F3F3"
-    tools:context=".MainActivity">
+<layout>
 
-    <androidx.appcompat.widget.Toolbar
+    <data>
+
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@color/white"
-        android:minHeight="?android:actionBarSize"
-        app:layout_constraintTop_toTopOf="parent"
-        app:title="手机遥控服务"
-        app:titleTextColor="@color/black" />
+        android:layout_height="match_parent"
+        android:background="#F3F3F3"
+        tools:context=".ServerActivity">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="我是遥控器服务端"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/mToolBar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/white"
+            android:minHeight="?android:actionBarSize"
+            app:layout_constraintTop_toTopOf="parent"
+            app:title="小溪遥控"
+            app:titleTextColor="@color/black" />
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+        <TextView
+            android:id="@+id/mTvTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:layout_marginTop="10dp"
+            android:text="我是小溪遥控TV版"
+            android:textColor="#373737"
+            android:textSize="28sp"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/mToolBar" />
+
+        <TextView
+            android:id="@+id/mTvTip1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:layout_marginTop="10dp"
+            android:text="1. 请先安装小溪遥控手机版。"
+            android:textColor="#535353"
+            android:textSize="24sp"
+            app:layout_constraintLeft_toLeftOf="@+id/mTvTitle"
+            app:layout_constraintTop_toBottomOf="@+id/mTvTitle" />
+
+        <TextView
+            android:id="@+id/mTvTip2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:layout_marginTop="10dp"
+            android:text="2. 请确保手机和智能电视或者盒子处于同一局域网内。"
+            android:textColor="#535353"
+            android:textSize="24sp"
+            app:layout_constraintLeft_toLeftOf="@+id/mTvTitle"
+            app:layout_constraintTop_toBottomOf="@+id/mTvTip1" />
+
+        <TextView
+            android:id="@+id/mTvTip3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:layout_marginTop="10dp"
+            android:text="3. 打开手机上打开小溪遥控点击右上角搜索按钮搜索可连接设备。"
+            android:textColor="#535353"
+            android:textSize="24sp"
+            app:layout_constraintLeft_toLeftOf="@+id/mTvTitle"
+            app:layout_constraintTop_toBottomOf="@+id/mTvTip2" />
+
+        <TextView
+            android:id="@+id/mTvTip4"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:layout_marginTop="10dp"
+            android:text="4. 连接成功即可通过手机遥控智能电视或者盒子。"
+            android:textColor="#535353"
+            android:textSize="24sp"
+            app:layout_constraintLeft_toLeftOf="@+id/mTvTitle"
+            app:layout_constraintTop_toBottomOf="@+id/mTvTip3" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

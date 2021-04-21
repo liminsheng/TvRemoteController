@@ -57,9 +57,13 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@color/white"
+            android:elevation="4dp"
             android:minHeight="?android:actionBarSize"
+            android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
             app:layout_constraintTop_toTopOf="parent"
-            app:title="手机遥控"
+            app:menu="@menu/action_menu"
+            app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
+            app:title="小溪遥控"
             app:titleTextColor="#6E6E6E" />
 
         <androidx.appcompat.widget.AppCompatImageButton

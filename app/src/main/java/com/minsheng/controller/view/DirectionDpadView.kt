@@ -52,6 +52,7 @@ class DirectionDpadView : View, GestureDetector.OnGestureListener {
     }
     private var mOkRadius = 0f
     private var mPressKey = -1
+    private var isLongPress = false
     private var mOnKeyListener: OnDirectionKeyListener? = null
 
     override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
@@ -110,6 +111,13 @@ class DirectionDpadView : View, GestureDetector.OnGestureListener {
     }
 
     override fun onTouchEvent(event: MotionEvent?): Boolean {
+        if (isLongPress && event?.action == MotionEvent.ACTION_UP) {
+            Log.d(TAG, "onLongPressUp: 长按松开")
+            if (mPressKey != -1) mOnKeyListener?.onLongPress(mPressKey, false)
+            isLongPress = false
+            mPressKey = -1
+            handlePress()
+        }
         return mGestureDetectorCompat.onTouchEvent(event)
     }
 
@@ -176,8 +184,8 @@ class DirectionDpadView : View, GestureDetector.OnGestureListener {
         return false
     }
 
-    override fun onLongPress(p0: MotionEvent?) {
-        if (mPressKey != -1) mOnKeyListener?.onLongPress(mPressKey)
+    override fun onLongPress(event: MotionEvent) {
+        if (mPressKey != -1) mOnKeyListener?.onLongPress(mPressKey, true)
         when (mPressKey) {
             KeyEvent.KEYCODE_DPAD_CENTER -> {
                 Log.d(TAG, "onLongPress: 长按了Ok")
@@ -198,13 +206,12 @@ class DirectionDpadView : View, GestureDetector.OnGestureListener {
                 Log.d(TAG, "onLongPress: 长按点击")
             }
         }
-        mPressKey = -1
-        handlePress()
+        isLongPress = true
     }
 
     interface OnDirectionKeyListener {
         fun onClick(keyCode: Int)
-        fun onLongPress(keyCode: Int)
+        fun onLongPress(keyCode: Int, action: Boolean)
     }
 
     fun setOnDirectionKeyListener(listener: OnDirectionKeyListener) {

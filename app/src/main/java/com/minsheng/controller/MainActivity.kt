@@ -1,96 +1,123 @@
 package com.minsheng.controller
 
+import android.content.Context
+import android.content.Intent
 import android.os.Bundle
+import android.os.Vibrator
 import android.view.KeyEvent
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import com.minsheng.controller.databinding.ActivityMainBinding
+import com.minsheng.controller.util.NetUtils
 import com.minsheng.controller.view.DirectionDpadView
-import java.io.IOException
-import java.net.DatagramPacket
-import java.net.DatagramSocket
-import java.net.InetSocketAddress
-import java.net.SocketException
-import java.util.concurrent.Executors
 
 class MainActivity : AppCompatActivity() {
 
-    private val mExecutor = Executors.newCachedThreadPool()
-    private var mClient: DatagramSocket? = null
-
     private lateinit var mDataBinding: ActivityMainBinding
     private val mLiveData = MutableLiveData<String>()
+    private val mVibrator by lazy {
+        getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         mDataBinding =
             DataBindingUtil.setContentView(this, R.layout.activity_main)
         initView()
-        startUdpClient()
+        initListener()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        mDataBinding.mToolbar.subtitle = NetUtils.getInstance().ipClient ?: ""
     }
 
     private fun initView() {
         mLiveData.observe(this, Observer {
             mDataBinding.tips = it
+            mVibrator.vibrate(100)
         })
         mDataBinding.apply {
+            mToolbar.setOnMenuItemClickListener {
+                if (it.itemId == R.id.action_search) {
+                    val intent = Intent(this@MainActivity, DeviceListActivity::class.java)
+                    startActivity(intent)
+                }
+                true
+            }
             setOnShotDownClick {
                 mLiveData.value = "您点击了关机键"
+                NetUtils.getInstance().sendKey(KeyEvent.KEYCODE_POWER)
             }
             setOnVolumeDownClick {
                 mLiveData.value = "您点击了音量减键"
+                NetUtils.getInstance().sendKey(KeyEvent.KEYCODE_VOLUME_DOWN)
             }
             setOnVolumeUpClick {
                 mLiveData.value = "您点击了音量加键"
+                NetUtils.getInstance().sendKey(KeyEvent.KEYCODE_VOLUME_UP)
             }
             setOnHomeClick {
                 mLiveData.value = "您点击了主页键"
+                NetUtils.getInstance().sendKey(KeyEvent.KEYCODE_HOME)
             }
             setOnMenuClick {
                 mLiveData.value = "您点击了菜单键"
+                NetUtils.getInstance().sendKey(KeyEvent.KEYCODE_MENU)
             }
             setOnBackClick {
                 mLiveData.value = "您点击了返回键"
+                NetUtils.getInstance().sendKey(KeyEvent.KEYCODE_BACK)
             }
             directionDpadListener = object : DirectionDpadView.OnDirectionKeyListener {
                 override fun onClick(keyCode: Int) {
                     when (keyCode) {
                         KeyEvent.KEYCODE_DPAD_CENTER -> {
                             mLiveData.value = "您点击了确定键"
+                            NetUtils.getInstance().sendKey(KeyEvent.KEYCODE_DPAD_CENTER)
                         }
                         KeyEvent.KEYCODE_DPAD_UP -> {
                             mLiveData.value = "您点击了上键"
+                            NetUtils.getInstance().sendKey(KeyEvent.KEYCODE_DPAD_UP)
                         }
                         KeyEvent.KEYCODE_DPAD_DOWN -> {
                             mLiveData.value = "您点击了下键"
+                            NetUtils.getInstance().sendKey(KeyEvent.KEYCODE_DPAD_DOWN)
                         }
                         KeyEvent.KEYCODE_DPAD_LEFT -> {
                             mLiveData.value = "您点击了左键"
+                            NetUtils.getInstance().sendKey(KeyEvent.KEYCODE_DPAD_LEFT)
                         }
                         KeyEvent.KEYCODE_DPAD_RIGHT -> {
                             mLiveData.value = "您点击了右键"
+                            NetUtils.getInstance().sendKey(KeyEvent.KEYCODE_DPAD_RIGHT)
                         }
                     }
                 }
 
-                override fun onLongPress(keyCode: Int) {
+                override fun onLongPress(keyCode: Int, action: Boolean) {
                     when (keyCode) {
                         KeyEvent.KEYCODE_DPAD_CENTER -> {
-                            mLiveData.value = "您长按了确定键"
+                            mLiveData.value = "您长按了确定键 ${if (action) "" else "松开"}"
+                            NetUtils.getInstance().sendLongKey(KeyEvent.KEYCODE_DPAD_CENTER, action)
                         }
                         KeyEvent.KEYCODE_DPAD_UP -> {
-                            mLiveData.value = "您长按了上键"
+                            mLiveData.value = "您长按了上键 ${if (action) "" else "松开"}"
+                            NetUtils.getInstance().sendLongKey(KeyEvent.KEYCODE_DPAD_UP, action)
                         }
                         KeyEvent.KEYCODE_DPAD_DOWN -> {
-                            mLiveData.value = "您长按了下键"
+                            mLiveData.value = "您长按了下键 ${if (action) "" else "松开"}"
+                            NetUtils.getInstance().sendLongKey(KeyEvent.KEYCODE_DPAD_DOWN, action)
                         }
                         KeyEvent.KEYCODE_DPAD_LEFT -> {
-                            mLiveData.value = "您长按了左键"
+                            mLiveData.value = "您长按了左键 ${if (action) "" else "松开"}"
+                            NetUtils.getInstance().sendLongKey(KeyEvent.KEYCODE_DPAD_LEFT, action)
                         }
                         KeyEvent.KEYCODE_DPAD_RIGHT -> {
-                            mLiveData.value = "您长按了右键"
+                            mLiveData.value = "您长按了右键 ${if (action) "" else "松开"}"
+                            NetUtils.getInstance().sendLongKey(KeyEvent.KEYCODE_DPAD_RIGHT, action)
                         }
                     }
 
@@ -99,60 +126,15 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun startUdpClient() {
-        mExecutor.execute {
-            try {
-                val address = InetSocketAddress("192.168.2.184", 5557)
-                var dataOut: ByteArray? = null
-                //发送数据需要address
-                val datagramPacketOut =
-                    DatagramPacket(ByteArray(0), 0, address)
-                mClient = DatagramSocket().run {
-                    println("client端：")
-                    mExecutor.execute(ReceiveMsgRun(this))
-//                val scanner = Scanner(System.`in`)
-//                while (scanner.hasNextLine()) {
-//                    dataOut = scanner.nextLine().toByteArray()
-                    dataOut = "你好！".toByteArray()
-                    //获取键盘输入数据
-                    datagramPacketOut.data = dataOut
-                    //发送数据给server
-                    this.send(datagramPacketOut)
-                    this
-//                }
-                }
-            } catch (e: SocketException) {
-                e.printStackTrace()
-            } catch (e: IOException) {
-                e.printStackTrace()
-            }
+    private fun initListener() {
+        if (!NetUtils.getInstance().isConnectToClient) {
+            val intent = Intent(this@MainActivity, DeviceListActivity::class.java)
+            startActivity(intent)
         }
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        if (mClient?.isClosed != true) {
-            mClient?.close()
-        }
-        mExecutor.shutdown()
+//        NetUtils.getInstance().release()
     }
-}
-
-internal class ReceiveMsgRun(private val client: DatagramSocket) : Runnable {
-    override fun run() {
-        val len = 1024
-        val dataIn = ByteArray(len)
-        //接收数据
-        val datagramPacketIn = DatagramPacket(dataIn, len)
-        for (i in 0..99) {
-            try {
-                //接收server发来的数据
-                client.receive(datagramPacketIn)
-                println("msg form server: " + String(dataIn, 0, datagramPacketIn.length))
-            } catch (e: IOException) {
-                e.printStackTrace()
-            }
-        }
-    }
-
 }
