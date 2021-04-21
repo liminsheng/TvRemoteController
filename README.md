@@ -15,3 +15,5 @@ private fun sendKeyDownUpSync(keyCode: Int) = runBlocking {
     }
 ```
 ## 4. 效果图
+ ![按键界面](/snapshots/dpad.jpg)
+ ![搜索界面](/snapshots/search.jpg)
